@@ -1,0 +1,132 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Cadastro de Pets',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: PetForm(),
+    );
+  }
+}
+
+class PetForm extends StatefulWidget {
+  @override
+  _PetFormState createState() => _PetFormState();
+}
+
+class _PetFormState extends State<PetForm> {
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _contactController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _observationController = TextEditingController();
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Cadastro de Pets'),
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            children: <Widget>[
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(labelText: 'Nome'),
+                validator: (value) {
+                  if (value != null && value.isEmpty) {
+                    return 'Por favor, insira o nome do pet';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _contactController,
+                decoration: InputDecoration(labelText: 'Contato'),
+                validator: (value) {
+                  if (value != null && value.isEmpty) {
+                    return 'Por favor, insira o contato';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _addressController,
+                decoration: InputDecoration(labelText: 'Endereço'),
+                validator: (value) {
+                  if (value != null && value.isEmpty) {
+                    return 'Por favor, insira o endereço';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _phoneController,
+                decoration: InputDecoration(labelText: 'Telefone'),
+                validator: (value) {
+                  if (value != null && value.isEmpty) {
+                    return 'Por favor, insira o telefone';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _cityController,
+                decoration: InputDecoration(labelText: 'Cidade'),
+                validator: (value) {
+                  if (value != null && value.isEmpty) {
+                    return 'Por favor, insira a cidade';
+                  }
+                  return null;
+                },
+              ),
+              TextFormField(
+                controller: _observationController,
+                decoration: InputDecoration(labelText: 'Observação'),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    // Faça algo com os dados do formulário
+                    print('Nome: ${_nameController.text}');
+                    print('Contato: ${_contactController.text}');
+                    print('Endereço: ${_addressController.text}');
+                    print('Telefone: ${_phoneController.text}');
+                    print('Cidade: ${_cityController.text}');
+                    print('Observação: ${_observationController.text}');
+                  }
+                },
+                child: Text('Cadastrar'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _contactController.dispose();
+    _addressController.dispose();
+    _phoneController.dispose();
+    _cityController.dispose();
+    _observationController.dispose();
+    super.dispose();
+  }
+}
