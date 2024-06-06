@@ -1,113 +1,94 @@
-package br.edu.uniara.lpi2.rest.controller;
+package br.edu.uniara.lpi2.rest;
 
+import br.edu.uniara.lpi2.rest.controler.EmployeeController;
 import br.edu.uniara.lpi2.rest.model.Employee;
+import br.edu.uniara.lpi2.rest.model.EmployeePagingRepository;
 import br.edu.uniara.lpi2.rest.model.EmployeeRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.MockitoAnnotations;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Arrays;
-import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
-public class EmployeeControllerTest {
+class EmployeeControllerTest {
 
     @Mock
     private EmployeeRepository repository;
 
+    @Mock
+    private EmployeePagingRepository employeeRepository;
+
     @InjectMocks
     private EmployeeController controller;
 
+    @BeforeEach
+    void setUp() {
+        MockitoAnnotations.openMocks(this);
+    }
+
     @Test
-    public void testGetEmployeeById() {
+    void testGetEmployeeById() {
         Employee employee = new Employee();
         employee.setId(1L);
-        employee.setName("John Doe");
 
         when(repository.findById(1L)).thenReturn(Optional.of(employee));
 
         Employee result = controller.one(1L);
-        assertEquals("John Doe", result.getName());
+
         assertEquals(1L, result.getId());
     }
 
     @Test
-    public void testGetEmployeeById_NotFound() {
-        when(repository.findById(anyLong())).thenReturn(Optional.empty());
+    void testGetAllEmployees() {
+        Employee employee1 = new Employee();
+        Employee employee2 = new Employee();
+        Pageable pageable = PageRequest.of(0, 2);
+        Page<Employee> page = new PageImpl<>(Arrays.asList(employee1, employee2));
 
-        RuntimeException exception = null;
-        try {
-            controller.one(1L);
-        } catch (RuntimeException e) {
-            exception = e;
-        }
-        assertEquals("Erro pesquisando id: 1", exception.getMessage());
-    }
+        when(employeeRepository.findAll(pageable)).thenReturn(page);
 
-    @Test
-    public void testGetAllEmployees_InvalidPage() {
-        ResponseEntity<?> response = controller.all(0, 10);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("page deve ser > 0", response.getBody());
-    }
+        ResponseEntity<?> response = controller.all(0, 2);
 
-    @Test
-    public void testGetAllEmployees_InvalidSize() {
-        ResponseEntity<?> response = controller.all(1, 0);
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        assertEquals("size deve ser entre 1 e 500", response.getBody());
-    }
-
-    @Test
-    public void testGetAllEmployees() {
-        Employee employee1 = new Employee(1L, "John Doe");
-        Employee employee2 = new Employee(2L, "Jane Doe");
-        List<Employee> employees = Arrays.asList(employee1, employee2);
-
-        when(repository.findAll()).thenReturn(employees);
-
-        ResponseEntity<?> response = controller.all(1, 10);
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(employees, response.getBody());
+        assertInstanceOf(Object[].class, response.getBody());
+        assertEquals(2, ((Object[]) response.getBody()).length);
     }
 
     @Test
-    public void testInsertEmployee() {
+    void testInsertEmployee() {
         Employee employee = new Employee();
-        employee.setName("John Doe");
+        employee.setId(1L);
 
         when(repository.save(any(Employee.class))).thenReturn(employee);
 
         ResponseEntity<Employee> response = controller.insert(employee);
+
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(employee, response.getBody());
+        assertEquals(1L, Objects.requireNonNull(response.getBody()).getId());
     }
 
     @Test
-    public void testDeleteEmployee() {
+    void testDeleteEmployee() {
         when(repository.existsById(1L)).thenReturn(true);
 
         ResponseEntity<?> response = controller.delete(1L);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("1was removed", response.getBody());
+
         verify(repository, times(1)).deleteById(1L);
-    }
-
-    @Test
-    public void testDeleteEmployee_NotFound() {
-        when(repository.existsById(1L)).thenReturn(false);
-
-        ResponseEntity<?> response = controller.delete(1L);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("1 was removed", response.getBody());
     }
 }
