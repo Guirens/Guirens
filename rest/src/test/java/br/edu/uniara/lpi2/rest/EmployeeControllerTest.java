@@ -10,7 +10,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -45,11 +45,13 @@ public class EmployeeControllerTest {
     public void testGetEmployeeById_NotFound() {
         when(repository.findById(anyLong())).thenReturn(Optional.empty());
 
+        RuntimeException exception = null;
         try {
             controller.one(1L);
         } catch (RuntimeException e) {
-            assertEquals("Erro pesquisando id: 1", e.getMessage());
+            exception = e;
         }
+        assertEquals("Erro pesquisando id: 1", exception.getMessage());
     }
 
     @Test
@@ -68,9 +70,9 @@ public class EmployeeControllerTest {
 
     @Test
     public void testGetAllEmployees() {
-        List<Employee> employees = new ArrayList<>();
-        employees.add(new Employee(1L, "John Doe"));
-        employees.add(new Employee(2L, "Jane Doe"));
+        Employee employee1 = new Employee(1L, "John Doe");
+        Employee employee2 = new Employee(2L, "Jane Doe");
+        List<Employee> employees = Arrays.asList(employee1, employee2);
 
         when(repository.findAll()).thenReturn(employees);
 
@@ -94,11 +96,11 @@ public class EmployeeControllerTest {
     @Test
     public void testDeleteEmployee() {
         when(repository.existsById(1L)).thenReturn(true);
-        doNothing().when(repository).deleteById(1L);
 
         ResponseEntity<?> response = controller.delete(1L);
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("1was removed", response.getBody());
+        verify(repository, times(1)).deleteById(1L);
     }
 
     @Test
