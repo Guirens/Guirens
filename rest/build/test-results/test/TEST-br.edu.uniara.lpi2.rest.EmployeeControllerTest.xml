@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="br.edu.uniara.lpi2.rest.EmployeeControllerTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2024-05-17T17:45:33" hostname="DESKTOP-8QRK7JL" time="1.053">
+  <properties/>
+  <testcase name="testDeleteEmployee()" classname="br.edu.uniara.lpi2.rest.EmployeeControllerTest" time="1.023"/>
+  <testcase name="testGetEmployeeById()" classname="br.edu.uniara.lpi2.rest.EmployeeControllerTest" time="0.005"/>
+  <testcase name="testGetAllEmployees()" classname="br.edu.uniara.lpi2.rest.EmployeeControllerTest" time="0.012"/>
+  <testcase name="testInsertEmployee()" classname="br.edu.uniara.lpi2.rest.EmployeeControllerTest" time="0.009"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
